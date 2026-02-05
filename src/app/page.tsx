@@ -1,44 +1,57 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from "react";
-import { CheckCircle, Download } from "lucide-react";
+import { useCurrentRole } from "@/hooks/auth";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default function Home() {
-  const [downloaded, setDownloaded] = useState(false);
+export default function Dashboard() {
+  const router = useRouter();
+  const role = useCurrentRole();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  // Function to handle download
-  const handleDownload = () => {    
-    const link = document.createElement("a");
-    link.href = "/MyFile.pdf"; // place PDF in public folder
-    link.download = "MyFile.pdf";
-    link.click();
-    setDownloaded(true);
-  };
+
+  console.log("role",role);
+  
+  if (!role) {
+    window.location.reload();
+  }
 
   useEffect(() => {
-    handleDownload();
-  }, []);
+    if (!role) {
+      window.location.reload();
+      router.push("/auth/login");
+      return;
+    }
+
+    setIsRedirecting(true);
+   
+    
+
+
+    switch (role) {
+      case "ADMIN":
+        router.push("/dashboard/admin/");
+        break;
+      case "USER":
+          router.push("/dashboard/user");
+          break;
+      default:
+        setIsRedirecting(false);
+        break;
+    }
+  }, [router, role]);
+
+  if (isRedirecting) {
+    return    <span className="flex items-center justify-center">
+    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+    Loading...
+  </span>
+  }
 
   return (
-    <main className="min-h-screen bg-gray-100 flex items-center justify-center p-6">
-      <div className="bg-white shadow-xl rounded-2xl p-8 w-full max-w-md text-center">
-        {downloaded && (
-          <>
-            <div className="flex items-center justify-center gap-2 text-green-600 font-medium mb-6">
-              <CheckCircle className="w-6 h-6" />
-              <span>Thank you for downloading!</span>
-            </div>
-
-            <button
-              onClick={handleDownload}
-              className="flex items-center gap-2 m-auto bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl shadow-lg transition"
-            >
-              <Download className="w-5 h-5" />
-              Download Again
-            </button>
-          </>
-        )}
-      </div>
-    </main>
+    <div className="mx-4">{/* Your default dashboard content goes here */}</div>
   );
 }

@@ -5,29 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1742450911837,
-      "tag": "0000_rare_miss_america",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1749619829226,
-      "tag": "0001_little_silver_samurai",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1750136093142,
-      "tag": "0002_nappy_network",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1750140309124,
-      "tag": "0003_pretty_famine",
+      "when": 1770274972450,
+      "tag": "0000_wealthy_dagger",
       "breakpoints": true
     }
   ]

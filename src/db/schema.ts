@@ -10,7 +10,8 @@ import {
   text,
   timestamp,
   uniqueIndex,
-  uuid
+  uuid,
+  date
 } from "drizzle-orm/pg-core";
 
 // ===== ENUMS =====
@@ -134,5 +135,17 @@ export const PasswordResetTokenTable = pgTable(
   ]
 );
 
-
+export const requestStatus = pgEnum("request_status" ,["accepted" ,"denied" ,"pending"]);
+export const requestType = pgEnum("request_type",["work_from_home" ,"holiday" ,"halfday" ,"other"]);
+export const employeeRequest = pgTable("employee_request",{
+    id: uuid("id").defaultRandom().primaryKey(),
+    userid: uuid("user_id").references(()=>UsersTable.id, {onDelete: "cascade"}),
+    name: text("name"),
+    email: text("email"),
+    type: requestType("type"),
+    reason: text("reason"),
+    startDate: date("start_date"),
+    endDate: date("end_date"),
+    status: requestStatus("status").default("pending")
+})
 
