@@ -1,5 +1,5 @@
 import { db } from '@/db'
-import { requests, UsersTable } from '@/db/schema'
+import { workLogs, UsersTable } from '@/db/schema'
 import { eq } from 'drizzle-orm'
 import { FileText, Clock, CheckCircle, XCircle, Filter } from 'lucide-react'
 import RequestFilters from '@/components/admin/RequestFilters'
@@ -7,7 +7,7 @@ import RequestCard from '@/components/admin/RequestCard'
 
 interface PageProps {
   searchParams: {
-    status?: 'pending' | 'approved' | 'rejected'
+    status?: 'draft' | 'approved' | 'submitted'
   }
 }
 
@@ -15,24 +15,24 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   // Fetch requests with user info
   let query = db
     .select({
-      id: requests.id,
-      userId: requests.userId,
+      id: workLogs.id,
+      employeeId: workLogs.employeeId,
       userName: UsersTable.name,
       userEmail: UsersTable.email,
-      type: requests.type,
-      description: requests.description,
-      status: requests.status,
-      adminRemarks: requests.adminRemarks,
-      createdAt: requests.createdAt,
-      updatedAt: requests.updatedAt,
+      dayType: workLogs.dayType,
+      hours: workLogs.hours,
+      description: workLogs.workDescription,
+      status: workLogs.status,
+      workDate: workLogs.workDate,
+      createdAt: workLogs.createdAt,
     })
-    .from(requests)
-    .leftJoin(UsersTable, eq(requests.userId, UsersTable.id))
+    .from(workLogs)
+    .leftJoin(UsersTable, eq(workLogs.employeeId, UsersTable.id))
     .$dynamic()
 
   // Filter by status
   if (searchParams.status) {
-    query = query.where(eq(requests.status, searchParams.status))
+    query = query.where(eq(workLogs.status, searchParams.status))
   }
 
   const allRequests = await query
@@ -40,9 +40,9 @@ export default async function RequestsPage({ searchParams }: PageProps) {
   // Calculate stats
   const stats = {
     total: allRequests.length,
-    pending: allRequests.filter((r) => r.status === 'pending').length,
+    pending: allRequests.filter((r) => r.status === 'draft').length,
     approved: allRequests.filter((r) => r.status === 'approved').length,
-    rejected: allRequests.filter((r) => r.status === 'rejected').length,
+    submitted: allRequests.filter((r) => r.status === 'submitted').length,
   }
 
   return (
@@ -64,7 +64,7 @@ export default async function RequestsPage({ searchParams }: PageProps) {
           color="gray"
         />
         <StatCard
-          label="Pending"
+          label="draft"
           value={stats.pending}
           icon={<Clock className="h-5 w-5" />}
           color="yellow"
@@ -76,10 +76,10 @@ export default async function RequestsPage({ searchParams }: PageProps) {
           color="green"
         />
         <StatCard
-          label="Rejected"
-          value={stats.rejected}
+          label="Submitted"
+          value={stats.submitted}
           icon={<XCircle className="h-5 w-5" />}
-          color="red"
+          color="blue"
         />
       </div>
 
@@ -112,13 +112,13 @@ function StatCard({
   label: string
   value: number
   icon: React.ReactNode
-  color: 'gray' | 'yellow' | 'green' | 'red'
+  color: 'gray' | 'yellow' | 'green' | 'blue'
 }) {
   const colorClasses = {
     gray: 'bg-gray-50 text-gray-700',
     yellow: 'bg-yellow-50 text-yellow-700',
     green: 'bg-green-50 text-green-700',
-    red: 'bg-red-50 text-red-700',
+    blue: 'bg-blue-50 text-blue-700',
   }
 
   return (

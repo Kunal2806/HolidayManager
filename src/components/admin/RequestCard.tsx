@@ -6,17 +6,17 @@ import { CheckCircle, XCircle, Clock, User, Calendar } from 'lucide-react'
 import { formatDistanceToNow } from 'date-fns'
 
 interface RequestCardProps {
-  request: {
-    id: number
-    userId: number | null
+    request: {
+    id: string
+    employeeId: string
     userName: string | null
     userEmail: string | null
-    type: string
+    dayType: "working" | "wfh" | "half_day" | "leave" | "holiday"
+    hours: string | null
     description: string | null
-    status: 'pending' | 'approved' | 'rejected'
-    adminRemarks: string | null
-    createdAt: Date
-    updatedAt: Date
+    status: "draft" | "submitted" | "approved" | null
+    workDate: string
+    createdAt: Date | null
   }
 }
 
@@ -74,7 +74,13 @@ export default function RequestCard({ request }: RequestCardProps) {
   }
 
   const statusConfig = {
-    pending: {
+    null:{
+      bg: 'bg-gray-50',
+      border: 'border-gray-200',
+      badge: 'bg-gray-100 text-gray-700',
+      icon: <Clock className="h-4 w-4" />,
+    },
+    draft: {
       bg: 'bg-yellow-50',
       border: 'border-yellow-200',
       badge: 'bg-yellow-100 text-yellow-700',
@@ -86,15 +92,15 @@ export default function RequestCard({ request }: RequestCardProps) {
       badge: 'bg-green-100 text-green-700',
       icon: <CheckCircle className="h-4 w-4" />,
     },
-    rejected: {
-      bg: 'bg-red-50',
-      border: 'border-red-200',
-      badge: 'bg-red-100 text-red-700',
+    submitted: {
+      bg: 'bg-blue-50',
+      border: 'border-blue-200',
+      badge: 'bg-blue-100 text-blue-700',
       icon: <XCircle className="h-4 w-4" />,
     },
   }
 
-  const config = statusConfig[request.status]
+  const config = statusConfig[request.status || "null"]
 
   return (
     <div
@@ -123,7 +129,7 @@ export default function RequestCard({ request }: RequestCardProps) {
             <div>
               <span className="text-sm font-medium text-gray-700">Type:</span>
               <span className="ml-2 rounded-full bg-white px-3 py-1 text-sm font-medium text-gray-700">
-                {request.type}
+                {request.dayType}
               </span>
             </div>
             {request.description && (
@@ -136,7 +142,7 @@ export default function RequestCard({ request }: RequestCardProps) {
                 </p>
               </div>
             )}
-            {request.adminRemarks && (
+            {/* {request. && (
               <div className="rounded-lg bg-white p-3">
                 <span className="text-sm font-medium text-gray-700">
                   Admin Remarks:
@@ -145,13 +151,13 @@ export default function RequestCard({ request }: RequestCardProps) {
                   {request.adminRemarks}
                 </p>
               </div>
-            )}
+            )} */}
           </div>
 
           {/* Timestamp */}
           <p className="mt-3 flex items-center gap-1 text-xs text-gray-500">
             <Calendar className="h-3 w-3" />
-            Submitted {formatDistanceToNow(new Date(request.createdAt), { addSuffix: true })}
+            Submitted {formatDistanceToNow(request.createdAt ? new Date(request.createdAt): "-", { addSuffix: true })}
           </p>
         </div>
 
@@ -160,12 +166,12 @@ export default function RequestCard({ request }: RequestCardProps) {
           className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${config.badge}`}
         >
           {config.icon}
-          {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+          {request.status && request.status.charAt(0).toUpperCase() + request.status.slice(1)}
         </span>
       </div>
 
       {/* Actions (only for pending requests) */}
-      {request.status === 'pending' && (
+      {request.status === 'draft' && (
         <div className="mt-4 border-t border-gray-200 pt-4">
           {!showRemarks ? (
             <div className="flex gap-2">

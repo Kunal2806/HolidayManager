@@ -1,5 +1,5 @@
 import { db } from '@/db'
-import { requests, UsersTable } from '@/db/schema'
+import { workLogs, UsersTable } from '@/db/schema'
 import { eq, sql, and, gte } from 'drizzle-orm'
 import { BarChart3, TrendingUp, Users, FileText } from 'lucide-react'
 
@@ -20,31 +20,31 @@ export default async function ReportsPage() {
     db.select({ count: sql<number>`count(*)` }).from(UsersTable),
     
     // Total requests
-    db.select({ count: sql<number>`count(*)` }).from(requests),
+    db.select({ count: sql<number>`count(*)` }).from(workLogs),
     
     // Recent requests (last 30 days)
     db
       .select({ count: sql<number>`count(*)` })
-      .from(requests)
-      .where(gte(requests.createdAt, thirtyDaysAgo)),
+      .from(workLogs)
+      .where(gte(workLogs.createdAt, thirtyDaysAgo)),
     
     // Requests by status
     db
       .select({
-        status: requests.status,
+        status: workLogs.status,
         count: sql<number>`count(*)`,
       })
-      .from(requests)
-      .groupBy(requests.status),
+      .from(workLogs)
+      .groupBy(workLogs.status),
     
     // Requests by type
     db
       .select({
-        type: requests.type,
+        type: workLogs.dayType,
         count: sql<number>`count(*)`,
       })
-      .from(requests)
-      .groupBy(requests.type)
+      .from(workLogs)
+      .groupBy(workLogs.dayType)
       .limit(10),
   ])
 
@@ -59,7 +59,7 @@ export default async function ReportsPage() {
     requestsByStatus.find((r) => r.status === 'approved')?.count || 0
   const totalProcessed =
     requestsByStatus
-      .filter((r) => r.status !== 'pending')
+      .filter((r) => r.status !== 'draft')
       .reduce((sum, r) => sum + (r.count || 0), 0) || 1
   const approvalRate = Math.round((approvedCount / totalProcessed) * 100)
 
@@ -112,10 +112,10 @@ export default async function ReportsPage() {
             {requestsByStatus.map((item) => (
               <StatusBar
                 key={item.status}
-                label={item.status.charAt(0).toUpperCase() + item.status.slice(1)}
+                label={item.status && item.status.charAt(0).toUpperCase() + item.status.slice(1) || ""}
                 value={item.count || 0}
                 total={stats.totalRequests}
-                status={item.status}
+                status={item.status || "null"}
               />
             ))}
           </div>
