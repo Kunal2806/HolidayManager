@@ -24,15 +24,12 @@ export default function Dashboard() {
     }
 
     setIsRedirecting(true);
-   
-    
-
 
     switch (role) {
       case "ADMIN":
-        router.push("/dashboard/admin/");
+        router.push("/admin/dashboard");
         break;
-      case "USER":
+      case "EMPLOYEE":
           router.push("/dashboard/user");
           break;
       default:

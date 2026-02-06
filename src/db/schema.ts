@@ -11,11 +11,14 @@ import {
   timestamp,
   uniqueIndex,
   uuid,
-  date
+  date,
+  varchar,
+  decimal,
+  unique
 } from "drizzle-orm/pg-core";
 
 // ===== ENUMS =====
-export const UserRole = pgEnum("user_role", ["ADMIN", "USER"]);
+export const UserRole = pgEnum("user_role", ["ADMIN", "MANAGER", "EMPLOYEE"]);
 export const VerificationStatus = pgEnum("verification_status", ["PENDING", "APPROVED", "REJECTED"]);
 export const ProjectStatus = pgEnum("project_status", ["DRAFT", "PUBLISHED", "ARCHIVED"]);
 
@@ -30,15 +33,15 @@ export const UsersTable = pgTable(
     password: text("password").notNull(),
     phone: text("phone"),
     phoneVerified: timestamp("phone_verified", { mode: "date" }),
-    role: UserRole("role").default("USER").notNull(),
-    organizationId: uuid("organization_id"),
+    role: UserRole("role").default("EMPLOYEE").notNull(),
+    // organizationId: uuid("organization_id"),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().notNull(),
   },
   (table) => [
     uniqueIndex("users_email_key").on(table.email),
     index("users_name_email_phone_idx").on(table.name, table.email, table.phone),
-    index("users_organization_idx").on(table.organizationId),
+    // index("users_organization_idx").on(table.organizationId),
   ]
 );
 
@@ -135,17 +138,111 @@ export const PasswordResetTokenTable = pgTable(
   ]
 );
 
-export const requestStatus = pgEnum("request_status" ,["accepted" ,"denied" ,"pending"]);
-export const requestType = pgEnum("request_type",["work_from_home" ,"holiday" ,"halfday" ,"other"]);
-export const employeeRequest = pgTable("employee_request",{
-    id: uuid("id").defaultRandom().primaryKey(),
-    userid: uuid("user_id").references(()=>UsersTable.id, {onDelete: "cascade"}),
-    name: text("name"),
-    email: text("email"),
-    type: requestType("type"),
-    reason: text("reason"),
-    startDate: date("start_date"),
-    endDate: date("end_date"),
-    status: requestStatus("status").default("pending")
+
+
+/* ENUMS */
+
+export const projectStatusEnum = pgEnum("project_status", [
+  "active",
+  "completed",
+  "on_hold",
+])
+
+export const dayTypeEnum = pgEnum("day_type", [
+  "working",
+  "wfh",
+  "half_day",
+  "leave",
+  "holiday",
+])
+
+export const logStatusEnum = pgEnum("log_status", [
+  "draft",
+  "submitted",
+  "approved",
+])
+
+/* EMPLOYEES */
+
+export const employees = pgTable("employees", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  userId: uuid("user_id")
+    .references(() => UsersTable.id)
+    .notNull()
+    .unique(),
+  managerId: uuid("manager_id")
+    .references(() => UsersTable.id)
+    .notNull(),
+  createdAt: timestamp("created_at").defaultNow(),
 })
+
+/* PROJECTS */
+
+export const projects = pgTable("projects", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  name: varchar("name", { length: 150 }).notNull(),
+  description: text("description"),
+  status: projectStatusEnum("status").default("active"),
+  createdAt: timestamp("created_at").defaultNow(),
+})
+
+/* MANAGER → PROJECT */
+
+export const managerProjects = pgTable("manager_projects", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  managerId: uuid("manager_id")
+    .references(() => UsersTable.id)
+    .notNull(),
+  projectId: uuid("project_id")
+    .references(() => projects.id)
+    .notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+})
+
+/* EMPLOYEE → PROJECT */
+
+export const employeeProjects = pgTable("employee_projects", {
+  id: uuid("id").defaultRandom().primaryKey(),
+  employeeId: uuid("employee_id")
+    .references(() => employees.id)
+    .notNull(),
+  projectId: uuid("project_id")
+    .references(() => projects.id)
+    .notNull(),
+  assignedAt: timestamp("assigned_at").defaultNow(),
+})
+
+/* WORK LOGS */
+
+export const workLogs = pgTable(
+  "work_logs",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    employeeId: uuid("employee_id")
+      .references(() => employees.id)
+      .notNull(),
+
+    projectId: uuid("project_id")
+      .references(() => projects.id),
+
+    workDate: date("work_date").notNull(),
+
+    dayType: dayTypeEnum("day_type").notNull(),
+
+    hours: decimal("hours").default("0"),
+
+    workDescription: text("work_description"),
+
+    status: logStatusEnum("status").default("draft"),
+
+    createdAt: timestamp("created_at").defaultNow(),
+    updatedAt: timestamp("updated_at").defaultNow(),
+  },
+  (table) => ({
+    uniqueEmployeeDate: unique().on(
+      table.employeeId,
+      table.workDate
+    ),
+  })
+)
 
