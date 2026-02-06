@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { UserCog, Trash2, AlertTriangle } from 'lucide-react'
 
 interface UserActionsProps {
-  userId: number
+  userId: string
   currentRole: string
   userName: string
 }
