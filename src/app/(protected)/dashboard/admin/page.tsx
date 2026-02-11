@@ -232,163 +232,244 @@ export default function AdminRequestsPage() {
   const hasActiveFilters = filters.status !== 'all' || filters.type !== 'all' || filters.search !== '' || filters.dateFrom !== '' || filters.dateTo !== '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-4">
-      {/* Decorative background elements */}
-      <div className="fixed inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+  <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-slate-100 p-2 sm:p-4 md:p-6">
+    {/* Decorative background elements */}
+    <div className="fixed inset-0 overflow-hidden pointer-events-none">
+      <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob"></div>
+      <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-purple-400 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000"></div>
+    </div>
+
+    <div className="max-w-7xl mx-auto relative z-10">
+      {/* Header */}
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-1">
+          Admin Dashboard
+        </h1>
+        <p className="text-xs sm:text-sm text-slate-600 truncate">
+          {admin.email}
+        </p>
+        <button 
+          onClick={handleLogout} 
+          className='text-red-500 hover:text-red-600 text-xs font-medium mt-1'
+        >
+          Logout
+        </button>
       </div>
 
-      <div className="max-w-7xl mx-auto relative z-10">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-slate-800 mb-1">
-            Admin Dashboard
-          </h1>
-          <p className="text-sm text-slate-600">
-            {admin.email}
-          </p>
-          <button onClick={handleLogout} className='text-red-500 hover:text-red-600 text-xs font-medium mt-1'>
-            Logout
-          </button>
+      {/* Stats Cards */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3 mb-3 sm:mb-4">
+        <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md border border-slate-200">
+          <div className="text-xl sm:text-2xl font-bold text-blue-600 mb-0.5">{totalRequests}</div>
+          <div className="text-[10px] sm:text-xs text-slate-600">Total Requests</div>
         </div>
-
-        {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-          <div className="bg-white rounded-xl p-4 shadow-md border border-slate-200">
-            <div className="text-2xl font-bold text-blue-600 mb-0.5">{totalRequests}</div>
-            <div className="text-xs text-slate-600">Total Requests</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-md border border-slate-200">
-            <div className="text-2xl font-bold text-amber-600 mb-0.5">{pendingCount}</div>
-            <div className="text-xs text-slate-600">Pending</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-md border border-slate-200">
-            <div className="text-2xl font-bold text-emerald-600 mb-0.5">{acceptedCount}</div>
-            <div className="text-xs text-slate-600">Approved</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-md border border-slate-200">
-            <div className="text-2xl font-bold text-rose-600 mb-0.5">{deniedCount}</div>
-            <div className="text-xs text-slate-600">Denied</div>
-          </div>
-          <div className="bg-white rounded-xl p-4 shadow-md border border-slate-200">
-            <div className="text-2xl font-bold text-purple-600 mb-0.5">{approvedDays}</div>
-            <div className="text-xs text-slate-600">Approved Days</div>
-          </div>
+        <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md border border-slate-200">
+          <div className="text-xl sm:text-2xl font-bold text-amber-600 mb-0.5">{pendingCount}</div>
+          <div className="text-[10px] sm:text-xs text-slate-600">Pending</div>
         </div>
+        <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md border border-slate-200">
+          <div className="text-xl sm:text-2xl font-bold text-emerald-600 mb-0.5">{acceptedCount}</div>
+          <div className="text-[10px] sm:text-xs text-slate-600">Approved</div>
+        </div>
+        <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md border border-slate-200">
+          <div className="text-xl sm:text-2xl font-bold text-rose-600 mb-0.5">{deniedCount}</div>
+          <div className="text-[10px] sm:text-xs text-slate-600">Denied</div>
+        </div>
+        <div className="bg-white rounded-lg sm:rounded-xl p-3 sm:p-4 shadow-md border border-slate-200 col-span-2 sm:col-span-1">
+          <div className="text-xl sm:text-2xl font-bold text-purple-600 mb-0.5">{approvedDays}</div>
+          <div className="text-[10px] sm:text-xs text-slate-600">Approved Days</div>
+        </div>
+      </div>
 
-        {/* Filters Bar */}
-        <div className="bg-white rounded-xl shadow-md border border-slate-200 mb-4 overflow-hidden">
-          <div className="p-3 space-y-3">
-            {/* First Row - Search and Quick Filters */}
-            <div className="flex items-center justify-between gap-3">
-              {/* Search */}
-              <div className="flex-1 max-w-md relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
-                <input
-                  type="text"
-                  placeholder="Search by name, email, or reason..."
-                  value={filters.search}
-                  onChange={(e) => handleFilterChange('search', e.target.value)}
-                  className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
-                />
-              </div>
-
-              {/* Filter Toggle & Quick Filters */}
-              <div className="flex items-center gap-2">
-                {/* Status Quick Filter */}
-                <select
-                  value={filters.status}
-                  onChange={(e) => handleFilterChange('status', e.target.value)}
-                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                >
-                  <option value="all">All Status</option>
-                  <option value="pending">Pending</option>
-                  <option value="accepted">Approved</option>
-                  <option value="denied">Denied</option>
-                </select>
-
-                {/* Type Quick Filter */}
-                <select
-                  value={filters.type}
-                  onChange={(e) => handleFilterChange('type', e.target.value)}
-                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                >
-                  <option value="all">All Types</option>
-                  <option value="holiday">Holiday</option>
-                  <option value="work_from_home">Work from Home</option>
-                  <option value="halfday">Half Day</option>
-                  <option value="other">Other</option>
-                </select>
-
-                {/* Clear Filters */}
-                {hasActiveFilters && (
-                  <button
-                    onClick={clearFilters}
-                    className="px-2.5 py-1.5 text-xs text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
+      {/* Filters Bar */}
+      <div className="bg-white rounded-lg sm:rounded-xl shadow-md border border-slate-200 mb-3 sm:mb-4 overflow-hidden">
+        <div className="p-2 sm:p-3 space-y-2 sm:space-y-3">
+          {/* First Row - Search and Quick Filters */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-3 sm:w-3.5 h-3 sm:h-3.5 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or reason..."
+                value={filters.search}
+                onChange={(e) => handleFilterChange('search', e.target.value)}
+                className="w-full pl-8 sm:pl-9 pr-2 sm:pr-3 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs sm:text-sm"
+              />
             </div>
 
-            {/* Second Row - Date Range Filter */}
-            <div className="flex items-center gap-3">
-              <div className="flex items-center gap-2 text-xs text-slate-600">
-                <Calendar className="w-3.5 h-3.5" />
-                <span className="font-medium">Filter by Date:</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <input
-                  type="date"
-                  value={filters.dateFrom}
-                  onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
-                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                  title="Show requests on or after this date"
-                />
-                <span className="text-slate-400 text-xs">to</span>
-                <input
-                  type="date"
-                  value={filters.dateTo}
-                  onChange={(e) => handleFilterChange('dateTo', e.target.value)}
-                  min={filters.dateFrom}
-                  className="px-2.5 py-1.5 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
-                  title="Show requests on or before this date"
-                />
-              </div>
+            {/* Filter Toggle & Quick Filters */}
+            <div className="flex items-center gap-2">
+              {/* Status Quick Filter */}
+              <select
+                value={filters.status}
+                onChange={(e) => handleFilterChange('status', e.target.value)}
+                className="flex-1 sm:flex-none px-2 sm:px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
+              >
+                <option value="all">All Status</option>
+                <option value="pending">Pending</option>
+                <option value="accepted">Approved</option>
+                <option value="denied">Denied</option>
+              </select>
+
+              {/* Type Quick Filter */}
+              <select
+                value={filters.type}
+                onChange={(e) => handleFilterChange('type', e.target.value)}
+                className="flex-1 sm:flex-none px-2 sm:px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
+              >
+                <option value="all">All Types</option>
+                <option value="holiday">Holiday</option>
+                <option value="work_from_home">Work from Home</option>
+                <option value="halfday">Half Day</option>
+                <option value="other">Other</option>
+              </select>
+
+              {/* Clear Filters */}
+              {hasActiveFilters && (
+                <button
+                  onClick={clearFilters}
+                  className="px-2 sm:px-2.5 py-1.5 sm:py-2 text-xs text-slate-600 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition-colors whitespace-nowrap"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Second Row - Date Range Filter */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 text-xs text-slate-600">
+              <Calendar className="w-3.5 h-3.5" />
+              <span className="font-medium">Filter by Date:</span>
+            </div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <input
+                type="date"
+                value={filters.dateFrom}
+                onChange={(e) => handleFilterChange('dateFrom', e.target.value)}
+                className="flex-1 sm:flex-none px-2 sm:px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
+                title="Show requests on or after this date"
+              />
+              <span className="text-slate-400 text-xs">to</span>
+              <input
+                type="date"
+                value={filters.dateTo}
+                onChange={(e) => handleFilterChange('dateTo', e.target.value)}
+                min={filters.dateFrom}
+                className="flex-1 sm:flex-none px-2 sm:px-2.5 py-1.5 sm:py-2 bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs"
+                title="Show requests on or before this date"
+              />
               {(filters.dateFrom || filters.dateTo) && (
-                <span className="text-xs text-slate-500 italic">
+                <span className="text-xs text-slate-500 italic w-full sm:w-auto">
                   Showing requests within this range
                 </span>
               )}
             </div>
           </div>
-
-          {/* Active Filters Indicator */}
-          {hasActiveFilters && (
-            <div className="px-3 pb-2 flex items-center gap-2 text-xs border-t border-slate-100 pt-2">
-              <span className="text-slate-500">Showing {filteredRequests.length} of {requests.length} requests</span>
-            </div>
-          )}
         </div>
 
-        {/* Requests Table */}
-        <div className="bg-white rounded-xl shadow-md border border-slate-200 ">
-          {filteredRequests.length === 0 ? (
-            <div className="p-12 text-center">
-              <Calendar className="w-16 h-16 text-slate-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-800 mb-2">
-                {hasActiveFilters ? 'No matching requests' : 'No requests yet'}
-              </h3>
-              <p className="text-slate-600 mb-4">
-                {hasActiveFilters 
-                  ? 'Try adjusting your filters' 
-                  : 'No employee requests available at the moment'}
-              </p>
+        {/* Active Filters Indicator */}
+        {hasActiveFilters && (
+          <div className="px-2 sm:px-3 pb-2 flex items-center gap-2 text-xs border-t border-slate-100 pt-2">
+            <span className="text-slate-500">
+              Showing {filteredRequests.length} of {requests.length} requests
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Requests Table */}
+      <div className="bg-white rounded-lg sm:rounded-xl shadow-md border border-slate-200 overflow-hidden">
+        {filteredRequests.length === 0 ? (
+          <div className="p-8 sm:p-12 text-center">
+            <Calendar className="w-12 sm:w-16 h-12 sm:h-16 text-slate-300 mx-auto mb-3 sm:mb-4" />
+            <h3 className="text-lg sm:text-xl font-semibold text-slate-800 mb-2">
+              {hasActiveFilters ? 'No matching requests' : 'No requests yet'}
+            </h3>
+            <p className="text-sm sm:text-base text-slate-600 mb-4">
+              {hasActiveFilters 
+                ? 'Try adjusting your filters' 
+                : 'No employee requests available at the moment'}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Mobile Card View */}
+            <div className="block lg:hidden divide-y divide-slate-200">
+              {filteredRequests.map((request) => (
+                <div key={request.id} className="p-3 sm:p-4 hover:bg-slate-50 transition-colors">
+                  {/* Header: Name & Status */}
+                  <div className="flex items-start justify-between mb-2">
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm font-medium text-slate-800 truncate">
+                        {request.name}
+                      </div>
+                      <div className="text-xs text-slate-500 truncate">
+                        {request.email}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 ml-2">
+                      {getStatusIcon(request.status)}
+                      <span
+                        className={`px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${getStatusBadgeStyle(
+                          request.status
+                        )}`}
+                      >
+                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Type & Date */}
+                  <div className="space-y-1.5 mb-3">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-base">{getTypeIcon(request.type)}</span>
+                      <span className="text-xs font-medium text-slate-800">
+                        {getTypeLabel(request.type)}
+                      </span>
+                      <span className="text-xs text-slate-400">•</span>
+                      <span className="text-xs font-medium text-slate-800">
+                        {calculateDays(request.startDate, request.endDate)} days
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-xs text-slate-600">
+                      <Calendar className="w-3 h-3" />
+                      <span className="truncate">
+                        {formatDate(request.startDate)} – {formatDate(request.endDate)}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Reason */}
+                  <p className="text-xs text-slate-600 line-clamp-2 mb-3">
+                    {request.reason}
+                  </p>
+
+                  {/* Actions */}
+                  {request.status === 'pending' && (
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => updateRequestStatus(request.id, 'accepted')}
+                        className="flex-1 px-3 py-1.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-xs font-medium flex items-center justify-center gap-1"
+                      >
+                        <CheckCircle className="w-3.5 h-3.5" />
+                        Accept
+                      </button>
+                      <button
+                        onClick={() => updateRequestStatus(request.id, 'denied')}
+                        className="flex-1 px-3 py-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors text-xs font-medium flex items-center justify-center gap-1"
+                      >
+                        <XCircle className="w-3.5 h-3.5" />
+                        Deny
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ))}
             </div>
-          ) : (
-            <div className="overflow-x-auto]">
+
+            {/* Desktop Table View */}
+            <div className="hidden lg:block overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-slate-50 border-b border-slate-200 sticky top-0 z-10">
                   <tr>
@@ -506,9 +587,10 @@ export default function AdminRequestsPage() {
                 </tbody>
               </table>
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
     </div>
-  );
+  </div>
+);
 }
